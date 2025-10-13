@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Branch League Forecast Pro+</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root {
+    --primary: #0284c7;
+    --accent: #22c55e;
+    --bg: #f1f5f9;
+    --text: #1e293b;
+    --card: rgba(255, 255, 255, 0.9);
+  }
+
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #0284c7, #22c55e);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.8s ease;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+
+  select, input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+
+  select:focus, input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 5px var(--primary);
+  }
+
+  .dropdown {
+    position: relative;
+    width: 100%;
+  }
+
+  .dropdown-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+
+  .dropdown-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 5px var(--primary);
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .dropdown-list li {
+    padding: 10px 14px;
+    cursor: pointer;
+    list-style: none;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .dropdown-list li:hover {
+    background: #f8f9fa;
+  }
+
+  .dropdown-list li:last-child {
+    border-bottom: none;
+  }
+
+  button {
+    grid-column: 1 / -1;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: var(--accent);
+    transform: scale(1.03);
+  }
+
+  #chartContainer {
+    display: none;
+    margin-top: 25px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  #summaryBox {
+    display: none;
+    margin-top: 25px;
+    background: #e8f5e9;
+    border-left: 6px solid var(--accent);
+    border-radius: 10px;
+    padding: 15px 20px;
+    line-height: 1.7;
+    font-size: 15px;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 20px; }
+    .container { padding: 15px; }
+    #summaryBox { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Branch League Forecast</h1>
+
+  <div class="form-grid">
+    <div class="dropdown">
+      <input type="text" id="branchInput" class="dropdown-input" placeholder="Pilih Branch" oninput="filterBranches()" onclick="toggleDropdown()">
+      <ul id="branchList" class="dropdown-list">
+        <!-- 🔹 SUMATERA SELATAN -->
+<li onclick="selectBranch('Palembang Sekip Jaya')">Palembang Sekip Jaya</li>
+<li onclick="selectBranch('Palembang Sukodadi')">Palembang Sukodadi</li>
+<li onclick="selectBranch('Palembang 8 Ulu')">Palembang 8 Ulu</li>
+<li onclick="selectBranch('Palembang Sukamaju')">Palembang Sukamaju</li>
+<li onclick="selectBranch('Palembang Karyajaya')">Palembang Karyajaya</li>
+<li onclick="selectBranch('Palembang Kalidoni')">Palembang Kalidoni</li>
+<li onclick="selectBranch('Palembang Talang Kelapa')">Palembang Talang Kelapa</li>
+
+<li onclick="selectBranch('Banyuasin Pangkalan Balai')">Banyuasin Pangkalan Balai</li>
+<li onclick="selectBranch('Banyuasin Betung')">Banyuasin Betung</li>
+<li onclick="selectBranch('Banyuasin Sungsang')">Banyuasin Sungsang</li>
+
+<li onclick="selectBranch('Musi Banyuasin Bayung Lencir')">Musi Banyuasin Bayung Lencir</li>
+<li onclick="selectBranch('Musi Banyuasin Pangkalan Gresik')">Musi Banyuasin Pangkalan Gresik</li>
+<li onclick="selectBranch('Musi Banyuasin Sungai Lilin')">Musi Banyuasin Sungai Lilin</li>
+
+<li onclick="selectBranch('OKI Tugu Mulyo')">OKI Tugu Mulyo</li>
+
+<!-- 🔹 LAMPUNG -->
+<li onclick="selectBranch('Mesuji Tedunggeram')">Mesuji Tedunggeram</li>
+<li onclick="selectBranch('Lampung Selatan Kalianda')">Lampung Selatan Kalianda</li>
+<li onclick="selectBranch('Lampung Tengah Bandar Jaya')">Lampung Tengah Bandar Jaya</li>
+
+<li onclick="selectBranch('Tulang Bawang Menggala')">Tulang Bawang Menggala</li>
+<li onclick="selectBranch('Tulang Bawang Banjar Agung')">Tulang Bawang Banjar Agung</li>
+
+<li onclick="selectBranch('Bandar Lampung Rajabasa')">Bandar Lampung Rajabasa</li>
+<li onclick="selectBranch('Bandar Lampung Rawa Laut')">Bandar Lampung Rawa Laut</li>
+<li onclick="selectBranch('Bandar Lampung Tanjung Senang')">Bandar Lampung Tanjung Senang</li>
+<li onclick="selectBranch('Bandar Lampung Campang Raya')">Bandar Lampung Campang Raya</li>
+
+<li onclick="selectBranch('Metro Hadimulyo Barat')">Metro Hadimulyo Barat</li>
+
+<!-- 🔹 BANGKA BELITUNG -->
+<li onclick="selectBranch('Bangka Barat Muntok')">Bangka Barat Muntok</li>
+<li onclick="selectBranch('Bangka Barat Kelapa')">Bangka Barat Kelapa</li>
+<li onclick="selectBranch('Bangka Sungai Liat')">Bangka Sungai Liat</li>
+<li onclick="selectBranch('Pangkal Pinang Batin Tikal')">Pangkal Pinang Batin Tikal</li>
+
+<!-- 🔹 JAMBI -->
+<li onclick="selectBranch('Jambi Thehok')">Jambi Thehok</li>
+<li onclick="selectBranch('Jambi Kenali Asam Bawah')">Jambi Kenali Asam Bawah</li>
+<li onclick="selectBranch('Jambi Kenali Besar')">Jambi Kenali Besar</li>
+<li onclick="selectBranch('Muaro Jambi Sengeti')">Muaro Jambi Sengeti</li>
+<li onclick="selectBranch('Tanjung Jabung Barat Merlung')">Tanjung Jabung Barat Merlung</li>
+
+<!-- 🔹 BENGKULU -->
+<li onclick="selectBranch('Bengkulu Jembatan Kecil')">Bengkulu Jembatan Kecil</li>
+
+      </ul>
+    </div>
+
+    <input type="number" id="targetInput" placeholder="Target Subscriber" min="1">
+    <input type="number" id="netInput" placeholder="Net Subs Saat Ini" min="0">
+    <input type="number" id="salesInput" placeholder="Jumlah Sales" min="1">
+    <input type="date" id="dateInput">
+    <button onclick="generateForecast()">Hitung Forecast</button>
+  </div>
+
+  <div id="chartContainer">
+    <canvas id="forecastChart"></canvas>
+  </div>
+
+  <div id="summaryBox"></div>
+</div>
+
+<script>
+let chart;
+let selectedBranch = "";
+
+function toggleDropdown() {
+  const list = document.getElementById("branchList");
+  list.style.display = list.style.display === "block" ? "none" : "block";
+}
+
+function selectBranch(branch) {
+  selectedBranch = branch;
+  document.getElementById("branchInput").value = branch;
+  document.getElementById("branchList").style.display = "none";
+}
+
+function filterBranches() {
+  const input = document.getElementById("branchInput");
+  const filter = input.value.toLowerCase();
+  const list = document.getElementById("branchList");
+  const items = list.getElementsByTagName("li");
+
+  if (filter) {
+    list.style.display = "block";
+    for (let i = 0; i < items.length; i++) {
+      const txtValue = items[i].textContent || items[i].innerText;
+      if (txtValue.toLowerCase().indexOf(filter) > -1) {
+        items[i].style.display = "";
+      } else {
+        items[i].style.display = "none";
+      }
+    }
+  } else {
+    list.style.display = "none";
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const dropdown = document.querySelector('.dropdown');
+  if (!dropdown.contains(event.target)) {
+    document.getElementById("branchList").style.display = "none";
+  }
+});
+
+function generateForecast() {
+  const branch = selectedBranch;
+  const target = parseInt(document.getElementById("targetInput").value);
+  const net = parseInt(document.getElementById("netInput").value);
+  const sales = parseInt(document.getElementById("salesInput").value);
+  const selectedDate = document.getElementById("dateInput").value;
+
+  if (!branch || !target || isNaN(net) || !sales || !selectedDate) {
+    alert("eiitsss isi dulu dong!");
+    return;
+  }
+
+  const today = new Date(selectedDate);
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const remainingDays = (lastDay - today) / (1000 * 60 * 60 * 24) + 1;
+
+  const totalNeed = Math.max(target - net, 0);
+  const perDay = totalNeed / remainingDays;
+  const perSales = totalNeed / (remainingDays * sales);
+
+  const sisaHari = Math.ceil(remainingDays);
+  const data = [];
+  let total = 0;
+
+  for (let i = 0; i < sisaHari; i++) {
+    const val = Math.floor(Math.random() * 2) + 1; // 1–2
+    data.push(val);
+    total += val;
+  }
+
+  // Koreksi agar total sesuai target
+  const adjust = totalNeed - data.reduce((a,b)=>a+b,0);
+  let i = 0;
+  while (Math.abs(adjust) > 0 && i < data.length) {
+    data[i]++;
+    i++;
+  }
+
+  const labels = Array.from({length: sisaHari}, (_, i) => `Tgl ${today.getDate() + i}`);
+
+  // Destroy chart lama
+  if (chart) chart.destroy();
+
+  document.getElementById("chartContainer").style.display = "block";
+
+  const ctx = document.getElementById("forecastChart").getContext("2d");
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: `Forecast Harian (${branch})`,
+        data: data,
+        backgroundColor: "#22c55eaa",
+        borderColor: "#16a34a",
+        borderWidth: 1.5,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true },
+        title: {
+          display: true,
+          text: `Forecast ${branch} (${sisaHari} hari tersisa)`,
+          font: { size: 16, weight: "bold" }
+        },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "top",
+          font: { weight: "bold" },
+          formatter: Math.round
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: "Subscriber / Hari" } },
+        x: { title: { display: true, text: "Tanggal" } }
+      }
+    },
+    plugins: [{
+      id: 'valueLabels',
+      afterDatasetsDraw(chart) {
+        const {ctx} = chart;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((bar, index) => {
+            const val = dataset.data[index];
+            ctx.fillStyle = "#000";
+            ctx.font = "bold 12px Poppins";
+            ctx.fillText(val, bar.x - 5, bar.y - 5);
+          });
+        });
+      }
+    }]
+  });
+
+  // Summary
+  const summary = `
+    <b>${branch}</b> memiliki target <b>${target}</b> subscriber.<br>
+    Saat ini sudah tercapai <b>${net}</b>, sehingga masih kurang <b>${totalNeed}</b> subscriber.<br>
+    Dengan sisa waktu <b>${sisaHari}</b> hari, kamu perlu menambah rata-rata <b>${Math.ceil(perDay)}</b> subscriber per hari.<br>
+    Dengan total <b>${sales}</b> sales, maka masing-masing sales perlu closing minimal <b>${Math.ceil(perSales)}</b> pelanggan per hari hingga akhir bulan.
+  `;
+
+  const summaryBox = document.getElementById("summaryBox");
+  summaryBox.style.display = "block";
+  summaryBox.innerHTML = summary;
+}
+</script>
+
+</body>
+</html>
