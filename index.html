@@ -312,32 +312,26 @@ function generateForecast() {
   const perSales = totalNeed / (remainingDays * sales);
 
   const sisaHari = Math.ceil(remainingDays);
-  const data = new Array(sisaHari).fill(0);
+  const data = new Array(sisaHari);
 
-  if (totalNeed < sisaHari) {
-    // Randomly select totalNeed days to assign 1 subscriber each
-    const selectedDays = [];
-    while (selectedDays.length < totalNeed) {
-      const randomIndex = Math.floor(Math.random() * sisaHari);
-      if (!selectedDays.includes(randomIndex)) {
-        selectedDays.push(randomIndex);
-      }
-    }
-    selectedDays.forEach(index => data[index] = 1);
-  } else {
-    // Existing logic for when totalNeed >= sisaHari
-    for (let i = 0; i < sisaHari; i++) {
-      const val = Math.floor(Math.random() * 2) + 1; // 1–2
-      data[i] = val;
-    }
-    // Koreksi agar total sesuai target
-    const adjust = totalNeed - data.reduce((a,b)=>a+b,0);
-    let i = 0;
-    while (Math.abs(adjust) > 0 && i < data.length) {
-      data[i]++;
-      i++;
+  // Distribute totalNeed across all days with integer values summing exactly to totalNeed
+  const base = Math.floor(totalNeed / sisaHari);
+  const remainder = totalNeed % sisaHari;
+
+  // Initialize all days with base
+  for (let i = 0; i < sisaHari; i++) {
+    data[i] = base;
+  }
+
+  // Randomly select 'remainder' days to increment by 1
+  const selectedDays = [];
+  while (selectedDays.length < remainder) {
+    const randomIndex = Math.floor(Math.random() * sisaHari);
+    if (!selectedDays.includes(randomIndex)) {
+      selectedDays.push(randomIndex);
     }
   }
+  selectedDays.forEach(index => data[index]++);
 
   const labels = Array.from({length: sisaHari}, (_, i) => `Tgl ${today.getDate() + i}`);
 
@@ -401,18 +395,12 @@ function generateForecast() {
   });
 
   // Summary
-  let summary = `
+  const summary = `
     <b>${branch}</b> memiliki target <b>${target}</b> subscriber.<br>
     Saat ini sudah tercapai <b>${net}</b>, sehingga masih kurang <b>${totalNeed}</b> subscriber.<br>
+    Sistem secara otomatis memberikan saran random di sisa <b>${sisaHari}</b> hari, dengan total <b>${totalNeed}</b> subscriber tersebar secara acak (beberapa hari kosong, beberapa hari lebih dari 1).<br>
+    Dengan total <b>${sales}</b> sales, maka masing-masing sales perlu closing minimal <b>${Math.ceil(perSales)}</b> pelanggan per hari hingga akhir bulan.
   `;
-
-  if (totalNeed < sisaHari) {
-    summary += `Sistem secara otomatis memberikan saran random di sisa <b>${sisaHari}</b> hari, dengan <b>${totalNeed}</b> hari mendapat 1 subscriber dan sisanya 0.<br>`;
-  } else {
-    summary += `Dengan sisa waktu <b>${sisaHari}</b> hari, kamu perlu menambah rata-rata <b>${Math.ceil(perDay)}</b> subscriber per hari.<br>`;
-  }
-
-  summary += `Dengan total <b>${sales}</b> sales, maka masing-masing sales perlu closing minimal <b>${Math.ceil(perSales)}</b> pelanggan per hari hingga akhir bulan.`;
 
   const summaryBox = document.getElementById("summaryBox");
   summaryBox.style.display = "block";
