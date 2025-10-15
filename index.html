@@ -171,6 +171,7 @@
   }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -250,6 +251,77 @@
 <script>
 let chart;
 let selectedBranch = "";
+
+// Load voices on page load
+window.addEventListener('load', () => {
+  speechSynthesis.getVoices();
+});
+
+function speakSummary(text) {
+  const cleanText = text.replace(/<[^>]*>/g, '');
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.lang = 'id-ID';
+
+  const voices = speechSynthesis.getVoices();
+  let selectedVoice = null;
+
+  // 1️⃣ Cari suara pria Indonesia yang mungkin terdengar tegas
+  selectedVoice = voices.find(voice =>
+    (voice.lang === 'id-ID' || voice.lang.startsWith('id')) &&
+    (
+      voice.name.toLowerCase().includes('male') ||
+      voice.name.toLowerCase().includes('bapak') ||
+      voice.name.toLowerCase().includes('wavenet-a') || // Suara Wavenet-A biasanya lebih tegas
+      voice.name.toLowerCase().includes('indonesia')
+    )
+  );
+
+  // 2️⃣ Kalau belum ketemu, ambil voice Indonesia apa pun
+  if (!selectedVoice) {
+    selectedVoice = voices.find(voice => voice.lang === 'id-ID' || voice.lang.startsWith('id'));
+  }
+
+  // 3️⃣ Fallback: ambil voice pertama
+  if (!selectedVoice && voices.length > 0) {
+    selectedVoice = voices[0];
+  }
+
+  if (selectedVoice) {
+    utterance.voice = selectedVoice;
+  }
+
+  // --- MODIFIKASI: PENGATURAN KARAKTER LEBIH NATURAL (TETAP KERAS & TEGAS) ---
+  utterance.pitch = 0.98;   // Sedikit lebih rendah dari normal (agar lebih berat/berwibawa)
+  utterance.rate = 0.98;    // Lebih natural/tidak terlalu cepat (mendekati 1.0)
+  utterance.volume = 1.0;   // Maksimal (tetap keras dan lantang)
+
+  // Simulasi “bicara natural dan tegas” dengan jeda yang lebih santai
+  const sentences = cleanText.split(/[.!?]/).filter(s => s.trim());
+  speechSynthesis.cancel();
+
+  sentences.forEach((sentence, index) => {
+    const part = new SpeechSynthesisUtterance(sentence.trim());
+    part.lang = utterance.lang;
+    part.voice = utterance.voice;
+    part.pitch = utterance.pitch;
+    part.rate = utterance.rate;
+    part.volume = utterance.volume;
+
+    // Jeda sedikit lebih lama (misal: 300ms) untuk kesan bernapas dan lebih natural
+    part.onend = () => {
+      if (index < sentences.length - 1) {
+        setTimeout(() => {}, 300); 
+      }
+    };
+
+    speechSynthesis.speak(part);
+  });
+}
+
+
+
+
+
 
 function toggleDropdown() {
   const list = document.getElementById("branchList");
@@ -394,17 +466,110 @@ function generateForecast() {
     }]
   });
 
-  // Summary
-  const summary = `
-    <b>${branch}</b> net targetnya <b>${target}</b> subscriber.<br>
-    per hari ini sudah tercapai <b>${net}</b> Subscriber, jadi masih kurang <b>${totalNeed}</b> subscriber.<br>
-    Nah sisa <b>${sisaHari}</b> hari lagi, dengan total <b>${totalNeed}</b> subscriber.<br>
-    Dan lo punya <b>${sales}</b> Area Coordinator, berarti masing-masing Area Coordinator perlu closing minimal <b>${Math.ceil(perSales)}</b> subscriber per hari sampai akhir bulan, kalau masih jauh gap nya lo coaching anaknya, kalau masih ga berubah lo review.
-  `;
+  // Tentukan nama sapaan berdasarkan nama branch
+let greeting = "";
+
+switch (branch) {
+  case "Palembang Sekip Jaya":
+    greeting = "Hey Adam! Branch";
+    break;
+  case "Palembang Sukodadi":
+    greeting = "Hey Chandri! Branch";
+    break;
+  case "Palembang Sukamaju":
+    greeting = "Hey Tommy! Branch";
+    break;
+  case "Palembang 8 Ulu":
+  case "Palembang karya jaya":
+    greeting = "Hey Faisal! Branch";
+    break;
+  case "Palembang Kalidoni":
+    greeting = "Hey Cesko! Branch";
+    break;
+  case "Palembang OKI Tugumulyo":
+  case "Palembang OKI Kayu agung":
+    greeting = "Hey Muhammad Imam! Branch";
+    break;
+  case "Banyuasin Sungsang":
+    greeting = "Hey Chandri! Branch";
+    break;
+  case "Banyuasin Pangkalan Balai":
+  case "Banyuasin Betung":
+    greeting = "Hey Haris! Branch";
+    break;
+  case "Musi Banyuasin Sungai lilin":
+  case "Musi Banyuasin Pangkalan gresik":
+  case "Musi Banyuasin bayung lencir":
+    greeting = "Hey Gery! Branch";
+    break;
+  case "Jambi Thehok":
+    greeting = "Hey Novianto!";
+    break;
+  case "Jambi Kenali Besar":
+    greeting = "Hey Adi! Branch";
+    break;
+  case "Jambi Kenali Asam Bawah":
+  case "Muaro Jambi Sengeti":
+  case "Tanjung Jabung Barat Merlung":
+    greeting = "Hey Cesco! Branch";
+    break;
+  case "Bandar Lampung Rawa Laut":
+    greeting = "Hey Anam! Branch";
+    break;
+  case "Bandar Lampung Campang Raya":
+    greeting = "Hey Yoga! Branch";
+    break;
+  case "Bandar Lampung Rajabasa":
+    greeting = "Hey Bangga! Branch";
+    break;
+  case "Bandar Lampung Tanjung Senang":
+    greeting = "Hey Tasil! Branch";
+    break;
+  case "Metro Hadimulyo Barat":
+    greeting = "Hey Hakim! Branch";
+    break;
+  case "Lampung Selatan Kalianda":
+    greeting = "Hey Bima! Branch";
+    break;
+  case "Lampung Tengah Bandar Jaya":
+    greeting = "Hey Hakim! Branch";
+    break;
+  case "Mesuji Umbulan Tedunggeram":
+  case "Tulang Bawang Menggala":
+  case "Tulang Bawang Banjar Agung":
+    greeting = "Hey Bobi! Branch";
+    break;
+  case "Bangka Barat Muntok":
+  case "Pangkal Pinang Batin Tikal Jaya":
+    greeting = "Hey Bayu! Branch";
+    break;
+  case "Bangka Sungai Liat Jaya":
+  case "Bangka Barat Kelapa":
+    greeting = "Hey Nuke Utami! Branch";
+    break;
+  case "Bengkulu Jembatan Kecil":
+    greeting = "Hey Okiyaki! Branch";
+    break;
+  default:
+    greeting = "Hey Team";
+    break;
+}
+
+// Summary
+const summary = `
+  <b>${greeting} ${branch}</b> , net targetnya <b>${target}</b> pelanggan.<br>
+  per hari ini sudah tercapai <b>${net}</b> pelanggan, jadi masih kurang <b>${totalNeed}</b> pelanggan.<br>
+  Nah sisa <b>${sisaHari}</b> hari lagi, totalnya <b>${totalNeed}</b> pelanggan.<br>
+  Dan lo punya <b>${sales}</b> Area Koordinator, berarti masing-masing Area Koordinator perlu closing minimal <b>${Math.ceil(perSales)}</b> Pelanggan per hari sampai akhir bulan, kalau masih jauh gap nya, lo coaching anaknya, kalau masih ga berubah lo lempar ke sungai musi.
+`;
+
 
   const summaryBox = document.getElementById("summaryBox");
   summaryBox.style.display = "block";
   summaryBox.innerHTML = summary;
+
+  // Speak the summary
+  speakSummary(summary);
 }
 </script>
 
