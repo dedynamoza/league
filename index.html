@@ -396,10 +396,10 @@ function generateForecast() {
 
   // Summary
   const summary = `
-    <b>${branch}</b> memiliki target <b>${target}</b> subscriber.<br>
-    Saat ini sudah tercapai <b>${net}</b>, sehingga masih kurang <b>${totalNeed}</b> subscriber.<br>
-    Sistem secara otomatis memberikan saran random di sisa <b>${sisaHari}</b> hari, dengan total <b>${totalNeed}</b> subscriber tersebar secara acak (beberapa hari kosong, beberapa hari lebih dari 1).<br>
-    Dengan total <b>${sales}</b> sales, maka masing-masing sales perlu closing minimal <b>${Math.ceil(perSales)}</b> pelanggan per hari hingga akhir bulan.
+    <b>${branch}</b> net targetnya <b>${target}</b> subscriber.<br>
+    per saat ini sudah tercapai <b>${net}</b>, jadi masih kurang <b>${totalNeed}</b> subscriber.<br>
+    Di sisa <b>${sisaHari}</b> hari, dengan total <b>${totalNeed}</b> subscriber.<br>
+    Kalau lo punya <b>${sales}</b> Area Coordinator, berarti masing-masing Area Coordinator perlu closing minimal <b>${Math.ceil(perSales)}</b> subscriber per hari sampai akhir bulan.
   `;
 
   const summaryBox = document.getElementById("summaryBox");
