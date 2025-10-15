@@ -397,9 +397,9 @@ function generateForecast() {
   // Summary
   const summary = `
     <b>${branch}</b> net targetnya <b>${target}</b> subscriber.<br>
-    per saat ini sudah tercapai <b>${net}</b>, jadi masih kurang <b>${totalNeed}</b> subscriber.<br>
-    Di sisa <b>${sisaHari}</b> hari, dengan total <b>${totalNeed}</b> subscriber.<br>
-    Kalau lo punya <b>${sales}</b> Area Coordinator, berarti masing-masing Area Coordinator perlu closing minimal <b>${Math.ceil(perSales)}</b> subscriber per hari sampai akhir bulan.
+    per hari ini sudah tercapai <b>${net}</b> Subscriber, jadi masih kurang <b>${totalNeed}</b> subscriber.<br>
+    Nah sisa <b>${sisaHari}</b> hari lagi, dengan total <b>${totalNeed}</b> subscriber.<br>
+    Dan lo punya <b>${sales}</b> Area Coordinator, berarti masing-masing Area Coordinator perlu closing minimal <b>${Math.ceil(perSales)}</b> subscriber per hari sampai akhir bulan, kalau masih jauh gap nya lo coaching anaknya, kalau masih ga berubah lo review.
   `;
 
   const summaryBox = document.getElementById("summaryBox");
